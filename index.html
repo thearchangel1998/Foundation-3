@@ -116,7 +116,7 @@
         }
 
         /* Responsive adjustments for scoreboards */
-        @media (min-width: 1400px) {
+        @media (min-width: 1280px) {
             .main-content {
                 margin-left: 250px;
                 margin-right: 250px;
@@ -156,7 +156,7 @@
                              <input type="text" id="student-name-input" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500" placeholder="Nhập tên học sinh...">
                              <button id="add-student-btn" class="px-6 py-3 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 transition">Thêm</button>
                          </div>
-                         <p class="text-sm text-gray-500 mt-2">Lưu ý: Bảng điểm sẽ hiển thị ở hai bên trên màn hình lớn.</p>
+                         <p class="text-sm text-gray-500 mt-2">Lưu ý: Bảng điểm sẽ hiển thị ở hai bên trên màn hình lớn (rộng hơn 1280px).</p>
                      </div>
                 </section>
 
@@ -255,19 +255,6 @@
                      </div>
                 </section>
                 
-                <!-- PART 4: WRAP-UP -->
-                <section>
-                    <h2 class="text-2xl font-semibold text-gray-800 border-l-4 border-indigo-500 pl-4 mb-6">Phần 4: Tổng kết (10 phút)</h2>
-                    <div class="bg-indigo-50 border border-indigo-200 rounded-lg p-6">
-                        <h3 class="text-xl font-semibold text-indigo-800 mb-4">Gợi ý tự luyện tập</h3>
-                        <ul class="list-disc list-inside space-y-2 text-gray-700">
-                            <li><strong>Shadowing:</strong> Nghe và lặp lại theo người bản xứ (phim, podcast). Bắt chước cả nhịp điệu và ngữ điệu.</li>
-                            <li><strong>Ghi âm:</strong> Tự ghi âm giọng nói của mình và so sánh với file audio gốc để nhận ra sự khác biệt.</li>
-                            <li><strong>Từ điển:</strong> Luôn tra phiên âm của từ mới. Các từ điển online như Oxford, Cambridge đều có phát âm.</li>
-                            <li><strong>Kiên trì:</strong> Phát âm cần thời gian để cải thiện. Hãy luyện tập đều đặn mỗi ngày!</li>
-                        </ul>
-                    </div>
-                </section>
             </main>
 
             <footer class="text-center mt-10 pt-6 border-t border-gray-200">
@@ -303,13 +290,11 @@
         let students = [];
         const addStudentBtn = document.getElementById('add-student-btn');
         const studentNameInput = document.getElementById('student-name-input');
-        const leftScoreboardContent = document.getElementById('left-scoreboard-content');
-        const rightScoreboardContent = document.getElementById('right-scoreboard-content');
+        const scoreboardContainer = document.getElementById('scoreboard-container');
 
-        function renderScoreboards() {
-            leftScoreboardContent.innerHTML = '';
-            rightScoreboardContent.innerHTML = '';
-            students.forEach((student, index) => {
+        function renderScoreboard() {
+            scoreboardContainer.innerHTML = '';
+            students.forEach((student) => {
                 const entry = document.createElement('div');
                 entry.className = 'student-entry';
                 
@@ -331,11 +316,7 @@
                 entry.appendChild(scoreEl);
                 entry.appendChild(plusBtn);
 
-                if (index % 2 === 0) {
-                    leftScoreboardContent.appendChild(entry);
-                } else {
-                    rightScoreboardContent.appendChild(entry);
-                }
+                scoreboardContainer.appendChild(entry);
             });
         }
 
@@ -343,7 +324,7 @@
             const student = students.find(s => s.id === studentId);
             if (student) {
                 student.score++;
-                renderScoreboards();
+                document.getElementById(`score-${studentId}`).textContent = student.score;
             }
         }
 
@@ -352,7 +333,7 @@
             if (name && !students.find(s => s.name === name)) {
                 students.push({ id: Date.now(), name: name, score: 0 });
                 studentNameInput.value = '';
-                renderScoreboards();
+                renderScoreboard();
             }
         });
         studentNameInput.addEventListener('keypress', (e) => {
