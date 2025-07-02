@@ -22,30 +22,6 @@
             background-color: var(--background-color);
             color: var(--text-color);
         }
-        .main-content {
-            margin-left: auto;
-            margin-right: auto;
-        }
-        .scoreboard {
-            position: fixed;
-            top: 0;
-            height: 100vh;
-            width: 240px;
-            background-color: #eef2ff;
-            padding: 20px;
-            overflow-y: auto;
-            border-right: 1px solid #ddd;
-            border-left: 1px solid #ddd;
-            display: none; /* Hidden by default, shown on large screens */
-        }
-        #left-scoreboard {
-            left: 0;
-            border-left: none;
-        }
-        #right-scoreboard {
-            right: 0;
-            border-right: none;
-        }
         .student-entry {
             display: flex;
             justify-content: space-between;
@@ -59,15 +35,12 @@
         .student-name {
             font-weight: 600;
             flex-grow: 1;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
         }
         .student-score {
             font-size: 1.2em;
             font-weight: 700;
             color: var(--primary-color);
-            margin: 0 10px;
+            margin: 0 15px;
         }
         .score-btn {
             background-color: var(--correct-color);
@@ -114,147 +87,141 @@
             background-color: #9ca3af;
             cursor: not-allowed;
         }
-
-        /* Responsive adjustments for scoreboards */
-        @media (min-width: 1280px) {
-            .main-content {
-                margin-left: 250px;
-                margin-right: 250px;
-            }
-            .scoreboard {
-                display: block;
-            }
-        }
     </style>
 </head>
 <body class="p-4 md:p-8">
 
-    <!-- Scoreboards (Fixed Position) -->
-    <div id="left-scoreboard" class="scoreboard">
-        <h2 class="text-xl font-bold text-center text-indigo-700 mb-4">Bảng Điểm</h2>
-        <div id="left-scoreboard-content"></div>
-    </div>
-    <div id="right-scoreboard" class="scoreboard">
-        <h2 class="text-xl font-bold text-center text-indigo-700 mb-4">Bảng Điểm</h2>
-        <div id="right-scoreboard-content"></div>
-    </div>
+    <div class="max-w-4xl mx-auto bg-white rounded-2xl shadow-lg p-6 md:p-10">
+        <header class="text-center pb-6 border-b-2 border-indigo-200">
+            <h1 class="text-3xl md:text-4xl font-bold text-indigo-700">IPA Tổng Kết: From Sounds to Sentences</h1>
+            <p class="text-gray-500 mt-2">Buổi học ôn tập tương tác (Bản Hoàn Thiện)</p>
+        </header>
 
-    <div class="max-w-4xl main-content">
-        <div class="bg-white rounded-2xl shadow-lg p-6 md:p-10">
-            <header class="text-center pb-6 border-b-2 border-indigo-200">
-                <h1 class="text-3xl md:text-4xl font-bold text-indigo-700">IPA Tổng Kết: From Sounds to Sentences</h1>
-                <p class="text-gray-500 mt-2">Buổi học ôn tập tương tác (Bản Hoàn Thiện)</p>
-            </header>
-
-            <main class="mt-8">
-                <!-- CLASS MANAGEMENT -->
-                <section id="class-management" class="mb-12">
-                     <h2 class="text-2xl font-semibold text-gray-800 border-l-4 border-indigo-500 pl-4 mb-6">Quản lý Lớp học</h2>
-                     <div class="bg-gray-50 rounded-lg p-6">
-                         <h3 class="text-xl font-semibold mb-4">Thêm học sinh</h3>
-                         <div class="flex flex-col sm:flex-row gap-4">
-                             <input type="text" id="student-name-input" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500" placeholder="Nhập tên học sinh...">
-                             <button id="add-student-btn" class="px-6 py-3 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 transition">Thêm</button>
-                         </div>
-                         <p class="text-sm text-gray-500 mt-2">Lưu ý: Bảng điểm sẽ hiển thị ở hai bên trên màn hình lớn (rộng hơn 1280px).</p>
+        <main class="mt-8">
+            <!-- CLASS MANAGEMENT -->
+            <section id="class-management" class="mb-12">
+                 <h2 class="text-2xl font-semibold text-gray-800 border-l-4 border-indigo-500 pl-4 mb-6">Quản lý Lớp học</h2>
+                 <div class="bg-gray-50 rounded-lg p-6">
+                     <h3 class="text-xl font-semibold mb-4">Thêm học sinh</h3>
+                     <div class="flex flex-col sm:flex-row gap-4">
+                         <input type="text" id="student-name-input" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500" placeholder="Nhập tên học sinh...">
+                         <button id="add-student-btn" class="px-6 py-3 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 transition">Thêm</button>
                      </div>
-                </section>
+                     <h3 class="text-xl font-semibold mt-8 mb-4">Bảng Điểm</h3>
+                     <div id="scoreboard-container" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <!-- Student entries will be injected here by JS -->
+                     </div>
+                 </div>
+            </section>
 
-                <!-- PART 1: SOUNDS REVIEW -->
-                <section class="mb-12">
-                    <h2 class="text-2xl font-semibold text-gray-800 border-l-4 border-indigo-500 pl-4 mb-6">Phần 1: Ôn tập ÂM 🗣️</h2>
+            <!-- PART 1: SOUNDS REVIEW -->
+            <section class="mb-12">
+                <h2 class="text-2xl font-semibold text-gray-800 border-l-4 border-indigo-500 pl-4 mb-6">Phần 1: Ôn tập ÂM 🗣️</h2>
+                
+                <div class="bg-gray-50 rounded-lg p-6 mb-6">
+                    <h3 class="text-xl font-semibold mb-4">Game: Sound Quiz (Chọn phiên âm đúng)</h3>
+                    <p class="mb-4 text-gray-600" id="sound-quiz-prompt">Nghe từ và chọn ký tự phiên âm đúng.</p>
+                    <div class="flex items-center justify-center my-6">
+                        <button class="px-5 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition text-3xl" id="play-sound-quiz-btn">▶️</button>
+                        <p class="ml-4 text-3xl font-bold text-gray-700" id="sound-quiz-word"></p>
+                    </div>
+                    <div id="sound-quiz-options" class="grid grid-cols-2 md:grid-cols-4 gap-4"></div>
+                    <div id="sound-quiz-feedback" class="feedback mt-6 p-3 rounded-lg text-center font-semibold text-white opacity-0"></div>
+                    <div class="text-center mt-6">
+                        <button id="next-sound-quiz-btn" class="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition">Câu tiếp theo</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- PART 2: WORDS REVIEW -->
+            <section class="mb-12">
+                <h2 class="text-2xl font-semibold text-gray-800 border-l-4 border-indigo-500 pl-4 mb-6">Phần 2: Ôn tập TỪ 📝</h2>
+                
+                <div class="bg-gray-50 rounded-lg p-6 mb-6">
+                    <h3 class="text-xl font-semibold mb-4">Quiz: Nhấn trọng âm ở đâu?</h3>
+                    <p class="text-gray-600 mb-4">Click vào âm tiết bạn nghĩ là trọng âm chính của từ.</p>
+                    <div class="text-center p-4 bg-white rounded-lg shadow-inner">
+                        <div class="text-4xl font-bold tracking-wider" id="word-stress-quiz"></div>
+                    </div>
+                    <div id="stress-feedback" class="feedback mt-4 p-3 rounded-lg text-center font-semibold text-white opacity-0"></div>
+                    <div class="text-center mt-4">
+                        <button class="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition" id="next-stress-word">Từ Tiếp Theo</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- PART 3: SENTENCES REVIEW -->
+            <section class="mb-12">
+                <h2 class="text-2xl font-semibold text-gray-800 border-l-4 border-indigo-500 pl-4 mb-6">Phần 3: Ôn tập CÂU & HỘI THOẠI 💬</h2>
+                 <div class="bg-gray-50 rounded-lg p-6 space-y-8">
                     
-                    <div class="bg-gray-50 rounded-lg p-6 mb-6">
-                        <h3 class="text-xl font-semibold mb-4">Game: Sound Quiz (Chọn phiên âm đúng)</h3>
-                        <p class="mb-4 text-gray-600" id="sound-quiz-prompt">Nghe từ và chọn ký tự phiên âm đúng.</p>
-                        <div class="flex items-center justify-center my-6">
-                            <button class="px-5 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition text-3xl" id="play-sound-quiz-btn">▶️</button>
-                            <p class="ml-4 text-3xl font-bold text-gray-700" id="sound-quiz-word"></p>
-                        </div>
-                        <div id="sound-quiz-options" class="grid grid-cols-2 md:grid-cols-4 gap-4"></div>
-                        <div id="sound-quiz-feedback" class="feedback mt-6 p-3 rounded-lg text-center font-semibold text-white opacity-0"></div>
-                        <div class="text-center mt-6">
-                            <button id="next-sound-quiz-btn" class="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition">Câu tiếp theo</button>
+                    <!-- Activity 1: Linking Sounds -->
+                    <div>
+                        <h3 class="text-xl font-semibold mb-2">Linking Sounds Practice (Luyện nối âm)</h3>
+                        <p class="text-gray-600 mb-4">Đọc câu, sau đó bấm nút để xem các vị trí nối âm.</p>
+                        <div class="p-4 bg-white rounded-lg shadow-inner">
+                           <div class="flex items-center justify-center mb-4">
+                               <button class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition text-2xl" id="play-linking-btn">▶️</button>
+                               <p class="text-xl text-center ml-4" id="linking-sentence-display"></p>
+                           </div>
+                           <div class="flex justify-center space-x-4">
+                               <button class="px-4 py-2 bg-amber-500 text-white rounded-lg hover:bg-amber-600 transition" id="show-linking-btn">Hiện nối âm</button>
+                               <button class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition" id="next-linking-btn">Câu khác</button>
+                           </div>
                         </div>
                     </div>
-                </section>
 
-                <!-- PART 2: WORDS REVIEW -->
-                <section class="mb-12">
-                    <h2 class="text-2xl font-semibold text-gray-800 border-l-4 border-indigo-500 pl-4 mb-6">Phần 2: Ôn tập TỪ 📝</h2>
-                    
-                    <div class="bg-gray-50 rounded-lg p-6 mb-6">
-                        <h3 class="text-xl font-semibold mb-4">Quiz: Nhấn trọng âm ở đâu?</h3>
-                        <p class="text-gray-600 mb-4">Click vào âm tiết bạn nghĩ là trọng âm chính của từ.</p>
-                        <div class="text-center p-4 bg-white rounded-lg shadow-inner">
-                            <div class="text-4xl font-bold tracking-wider" id="word-stress-quiz"></div>
-                        </div>
-                        <div id="stress-feedback" class="feedback mt-4 p-3 rounded-lg text-center font-semibold text-white opacity-0"></div>
-                        <div class="text-center mt-4">
-                            <button class="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition" id="next-stress-word">Từ Tiếp Theo</button>
+                    <!-- Activity 2: Intonation Quiz -->
+                    <div>
+                        <h3 class="text-xl font-semibold mb-2">Intonation Quiz (Quiz ngữ điệu)</h3>
+                        <p class="text-gray-600 mb-4">Đọc câu và quyết định ngữ điệu cuối câu là lên giọng hay xuống giọng.</p>
+                        <div class="p-4 bg-white rounded-lg shadow-inner">
+                            <div class="text-center mb-4">
+                                <p id="intonation-sentence-display" class="text-2xl font-semibold mb-4 p-4 bg-indigo-100 rounded-lg"></p>
+                            </div>
+                            <div class="flex justify-center space-x-4">
+                                <button class="px-6 py-3 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600 transition" onclick="checkIntonation('rising')">Lên giọng ↗</button>
+                                <button class="px-6 py-3 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600 transition" onclick="checkIntonation('falling')">Xuống giọng ↘</button>
+                            </div>
+                            <div id="intonation-feedback" class="feedback mt-4 p-3 rounded-lg text-center font-semibold text-white opacity-0"></div>
+                            <div class="text-center mt-4">
+                                <button id="next-intonation-btn" class="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition">Câu khác</button>
+                            </div>
                         </div>
                     </div>
-                </section>
 
-                <!-- PART 3: SENTENCES REVIEW -->
-                <section class="mb-12">
-                    <h2 class="text-2xl font-semibold text-gray-800 border-l-4 border-indigo-500 pl-4 mb-6">Phần 3: Ôn tập CÂU & HỘI THOẠI 💬</h2>
-                     <div class="bg-gray-50 rounded-lg p-6 space-y-8">
-                        
-                        <!-- Activity 1: Linking Sounds -->
-                        <div>
-                            <h3 class="text-xl font-semibold mb-2">Linking Sounds Practice (Luyện nối âm)</h3>
-                            <p class="text-gray-600 mb-4">Đọc câu, sau đó bấm nút để xem các vị trí nối âm.</p>
-                            <div class="p-4 bg-white rounded-lg shadow-inner">
-                               <div class="flex items-center justify-center mb-4">
-                                   <button class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition text-2xl" id="play-linking-btn">▶️</button>
-                                   <p class="text-xl text-center ml-4" id="linking-sentence-display"></p>
-                               </div>
-                               <div class="flex justify-center space-x-4">
-                                   <button class="px-4 py-2 bg-amber-500 text-white rounded-lg hover:bg-amber-600 transition" id="show-linking-btn">Hiện nối âm</button>
-                                   <button class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition" id="next-linking-btn">Câu khác</button>
-                               </div>
+                    <!-- Activity 3: Listening for Weak Forms -->
+                    <div>
+                        <h3 class="text-xl font-semibold mb-2">Listening for Weak Forms (Nghe dạng yếu)</h3>
+                        <div class="p-4 bg-white rounded-lg shadow-inner">
+                            <p class="mb-4 text-gray-600">Nghe câu và gõ lại chính xác những gì bạn nghe được.</p>
+                            <button class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition mb-4" id="play-weak-form-sentence">Nghe câu</button>
+                            <div class="flex items-center">
+                                <input type="text" id="weak-form-input" class="w-full p-2 border rounded-md" placeholder="Gõ câu bạn nghe được ở đây...">
+                                <button class="ml-2 px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600" id="check-weak-form-btn">Kiểm tra</button>
+                            </div>
+                            <p id="weak-form-feedback" class="mt-2 font-semibold"></p>
+                             <div class="text-center mt-4">
+                                <button id="next-weak-form-btn" class="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition">Câu khác</button>
                             </div>
                         </div>
-
-                        <!-- Activity 2: Intonation Quiz -->
-                        <div>
-                            <h3 class="text-xl font-semibold mb-2">Intonation Quiz (Quiz ngữ điệu)</h3>
-                            <p class="text-gray-600 mb-4">Đọc câu và quyết định ngữ điệu cuối câu là lên giọng hay xuống giọng.</p>
-                            <div class="p-4 bg-white rounded-lg shadow-inner">
-                                <div class="text-center mb-4">
-                                    <p id="intonation-sentence-display" class="text-2xl font-semibold mb-4 p-4 bg-indigo-100 rounded-lg"></p>
-                                </div>
-                                <div class="flex justify-center space-x-4">
-                                    <button class="px-6 py-3 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600 transition" onclick="checkIntonation('rising')">Lên giọng ↗</button>
-                                    <button class="px-6 py-3 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600 transition" onclick="checkIntonation('falling')">Xuống giọng ↘</button>
-                                </div>
-                                <div id="intonation-feedback" class="feedback mt-4 p-3 rounded-lg text-center font-semibold text-white opacity-0"></div>
-                                <div class="text-center mt-4">
-                                    <button id="next-intonation-btn" class="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition">Câu khác</button>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Activity 3: Listening for Weak Forms -->
-                        <div>
-                            <h3 class="text-xl font-semibold mb-2">Listening for Weak Forms (Nghe dạng yếu)</h3>
-                            <div class="p-4 bg-white rounded-lg shadow-inner">
-                                <p class="mb-4 text-gray-600">Nghe câu và gõ lại chính xác những gì bạn nghe được.</p>
-                                <button class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition mb-4" id="play-weak-form-sentence">Nghe câu</button>
-                                <div class="flex items-center">
-                                    <input type="text" id="weak-form-input" class="w-full p-2 border rounded-md" placeholder="Gõ câu bạn nghe được ở đây...">
-                                    <button class="ml-2 px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600" id="check-weak-form-btn">Kiểm tra</button>
-                                </div>
-                                <p id="weak-form-feedback" class="mt-2 font-semibold"></p>
-                                 <div class="text-center mt-4">
-                                    <button id="next-weak-form-btn" class="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition">Câu khác</button>
-                                </div>
-                            </div>
-                        </div>
-                     </div>
+                    </div>
+                 </div>
                 </section>
                 
+                <!-- PART 4: WRAP-UP -->
+                <section>
+                    <h2 class="text-2xl font-semibold text-gray-800 border-l-4 border-indigo-500 pl-4 mb-6">Phần 4: Tổng kết (10 phút)</h2>
+                    <div class="bg-indigo-50 border border-indigo-200 rounded-lg p-6">
+                        <h3 class="text-xl font-semibold text-indigo-800 mb-4">Gợi ý tự luyện tập</h3>
+                        <ul class="list-disc list-inside space-y-2 text-gray-700">
+                            <li><strong>Shadowing:</strong> Nghe và lặp lại theo người bản xứ (phim, podcast). Bắt chước cả nhịp điệu và ngữ điệu.</li>
+                            <li><strong>Ghi âm:</strong> Tự ghi âm giọng nói của mình và so sánh với file audio gốc để nhận ra sự khác biệt.</li>
+                            <li><strong>Từ điển:</strong> Luôn tra phiên âm của từ mới. Các từ điển online như Oxford, Cambridge đều có phát âm.</li>
+                            <li><strong>Kiên trì:</strong> Phát âm cần thời gian để cải thiện. Hãy luyện tập đều đặn mỗi ngày!</li>
+                        </ul>
+                    </div>
+                </section>
             </main>
 
             <footer class="text-center mt-10 pt-6 border-t border-gray-200">
