@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IPA Tổng Kết: From Sounds to Sentences (Bản Hoàn Thiện)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #4f46e5;
+            --secondary-color: #f59e0b;
+            --background-color: #f3f4f6;
+            --text-color: #1f2937;
+            --card-bg: #ffffff;
+            --correct-color: #10b981;
+            --wrong-color: #ef4444;
+            --neutral-color: #6b7280;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+        }
+        .main-content {
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .scoreboard {
+            position: fixed;
+            top: 0;
+            height: 100vh;
+            width: 240px;
+            background-color: #eef2ff;
+            padding: 20px;
+            overflow-y: auto;
+            border-right: 1px solid #ddd;
+            border-left: 1px solid #ddd;
+            display: none; /* Hidden by default, shown on large screens */
+        }
+        #left-scoreboard {
+            left: 0;
+            border-left: none;
+        }
+        #right-scoreboard {
+            right: 0;
+            border-right: none;
+        }
+        .student-entry {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            margin-bottom: 10px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        .student-name {
+            font-weight: 600;
+            flex-grow: 1;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .student-score {
+            font-size: 1.2em;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin: 0 10px;
+        }
+        .score-btn {
+            background-color: var(--correct-color);
+            color: white;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            border: none;
+            font-size: 1.5em;
+            line-height: 1;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            flex-shrink: 0;
+        }
+        .score-btn:hover {
+            background-color: #059669;
+        }
+        .ipa-option, .ipa {
+            font-family: 'Lucida Sans Unicode', 'Arial Unicode MS', sans-serif;
+            color: var(--primary-color);
+        }
+        .syllable {
+            cursor: pointer;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        .syllable:hover {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+        .feedback {
+            transition: opacity 0.5s;
+        }
+        .ipa-option.correct {
+            background-color: var(--correct-color);
+            border-color: var(--correct-color);
+            color: white;
+        }
+        .ipa-option.wrong {
+            background-color: var(--wrong-color);
+            border-color: var(--wrong-color);
+            color: white;
+        }
+        button:disabled {
+            background-color: #9ca3af;
+            cursor: not-allowed;
+        }
+
+        /* Responsive adjustments for scoreboards */
+        @media (min-width: 1400px) {
+            .main-content {
+                margin-left: 250px;
+                margin-right: 250px;
+            }
+            .scoreboard {
+                display: block;
+            }
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+
+    <!-- Scoreboards (Fixed Position) -->
+    <div id="left-scoreboard" class="scoreboard">
+        <h2 class="text-xl font-bold text-center text-indigo-700 mb-4">Bảng Điểm</h2>
+        <div id="left-scoreboard-content"></div>
+    </div>
+    <div id="right-scoreboard" class="scoreboard">
+        <h2 class="text-xl font-bold text-center text-indigo-700 mb-4">Bảng Điểm</h2>
+        <div id="right-scoreboard-content"></div>
+    </div>
+
+    <div class="max-w-4xl main-content">
+        <div class="bg-white rounded-2xl shadow-lg p-6 md:p-10">
+            <header class="text-center pb-6 border-b-2 border-indigo-200">
+                <h1 class="text-3xl md:text-4xl font-bold text-indigo-700">IPA Tổng Kết: From Sounds to Sentences</h1>
+                <p class="text-gray-500 mt-2">Buổi học ôn tập tương tác (Bản Hoàn Thiện)</p>
+            </header>
+
+            <main class="mt-8">
+                <!-- CLASS MANAGEMENT -->
+                <section id="class-management" class="mb-12">
+                     <h2 class="text-2xl font-semibold text-gray-800 border-l-4 border-indigo-500 pl-4 mb-6">Quản lý Lớp học</h2>
+                     <div class="bg-gray-50 rounded-lg p-6">
+                         <h3 class="text-xl font-semibold mb-4">Thêm học sinh</h3>
+                         <div class="flex flex-col sm:flex-row gap-4">
+                             <input type="text" id="student-name-input" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500" placeholder="Nhập tên học sinh...">
+                             <button id="add-student-btn" class="px-6 py-3 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 transition">Thêm</button>
+                         </div>
+                         <p class="text-sm text-gray-500 mt-2">Lưu ý: Bảng điểm sẽ hiển thị ở hai bên trên màn hình lớn.</p>
+                     </div>
+                </section>
+
+                <!-- PART 1: SOUNDS REVIEW -->
+                <section class="mb-12">
+                    <h2 class="text-2xl font-semibold text-gray-800 border-l-4 border-indigo-500 pl-4 mb-6">Phần 1: Ôn tập ÂM 🗣️</h2>
+                    
+                    <div class="bg-gray-50 rounded-lg p-6 mb-6">
+                        <h3 class="text-xl font-semibold mb-4">Game: Sound Quiz (Chọn phiên âm đúng)</h3>
+                        <p class="mb-4 text-gray-600" id="sound-quiz-prompt">Nghe từ và chọn ký tự phiên âm đúng.</p>
+                        <div class="flex items-center justify-center my-6">
+                            <button class="px-5 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition text-3xl" id="play-sound-quiz-btn">▶️</button>
+                            <p class="ml-4 text-3xl font-bold text-gray-700" id="sound-quiz-word"></p>
+                        </div>
+                        <div id="sound-quiz-options" class="grid grid-cols-2 md:grid-cols-4 gap-4"></div>
+                        <div id="sound-quiz-feedback" class="feedback mt-6 p-3 rounded-lg text-center font-semibold text-white opacity-0"></div>
+                        <div class="text-center mt-6">
+                            <button id="next-sound-quiz-btn" class="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition">Câu tiếp theo</button>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- PART 2: WORDS REVIEW -->
+                <section class="mb-12">
+                    <h2 class="text-2xl font-semibold text-gray-800 border-l-4 border-indigo-500 pl-4 mb-6">Phần 2: Ôn tập TỪ 📝</h2>
+                    
+                    <div class="bg-gray-50 rounded-lg p-6 mb-6">
+                        <h3 class="text-xl font-semibold mb-4">Quiz: Nhấn trọng âm ở đâu?</h3>
+                        <p class="text-gray-600 mb-4">Click vào âm tiết bạn nghĩ là trọng âm chính của từ.</p>
+                        <div class="text-center p-4 bg-white rounded-lg shadow-inner">
+                            <div class="text-4xl font-bold tracking-wider" id="word-stress-quiz"></div>
+                        </div>
+                        <div id="stress-feedback" class="feedback mt-4 p-3 rounded-lg text-center font-semibold text-white opacity-0"></div>
+                        <div class="text-center mt-4">
+                            <button class="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition" id="next-stress-word">Từ Tiếp Theo</button>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- PART 3: SENTENCES REVIEW -->
+                <section class="mb-12">
+                    <h2 class="text-2xl font-semibold text-gray-800 border-l-4 border-indigo-500 pl-4 mb-6">Phần 3: Ôn tập CÂU & HỘI THOẠI 💬</h2>
+                     <div class="bg-gray-50 rounded-lg p-6 space-y-8">
+                        
+                        <!-- Activity 1: Linking Sounds -->
+                        <div>
+                            <h3 class="text-xl font-semibold mb-2">Linking Sounds Practice (Luyện nối âm)</h3>
+                            <p class="text-gray-600 mb-4">Đọc câu, sau đó bấm nút để xem các vị trí nối âm.</p>
+                            <div class="p-4 bg-white rounded-lg shadow-inner">
+                               <div class="flex items-center justify-center mb-4">
+                                   <button class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition text-2xl" id="play-linking-btn">▶️</button>
+                                   <p class="text-xl text-center ml-4" id="linking-sentence-display"></p>
+                               </div>
+                               <div class="flex justify-center space-x-4">
+                                   <button class="px-4 py-2 bg-amber-500 text-white rounded-lg hover:bg-amber-600 transition" id="show-linking-btn">Hiện nối âm</button>
+                                   <button class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition" id="next-linking-btn">Câu khác</button>
+                               </div>
+                            </div>
+                        </div>
+
+                        <!-- Activity 2: Intonation Quiz -->
+                        <div>
+                            <h3 class="text-xl font-semibold mb-2">Intonation Quiz (Quiz ngữ điệu)</h3>
+                            <p class="text-gray-600 mb-4">Đọc câu và quyết định ngữ điệu cuối câu là lên giọng hay xuống giọng.</p>
+                            <div class="p-4 bg-white rounded-lg shadow-inner">
+                                <div class="text-center mb-4">
+                                    <p id="intonation-sentence-display" class="text-2xl font-semibold mb-4 p-4 bg-indigo-100 rounded-lg"></p>
+                                </div>
+                                <div class="flex justify-center space-x-4">
+                                    <button class="px-6 py-3 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600 transition" onclick="checkIntonation('rising')">Lên giọng ↗</button>
+                                    <button class="px-6 py-3 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600 transition" onclick="checkIntonation('falling')">Xuống giọng ↘</button>
+                                </div>
+                                <div id="intonation-feedback" class="feedback mt-4 p-3 rounded-lg text-center font-semibold text-white opacity-0"></div>
+                                <div class="text-center mt-4">
+                                    <button id="next-intonation-btn" class="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition">Câu khác</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Activity 3: Listening for Weak Forms -->
+                        <div>
+                            <h3 class="text-xl font-semibold mb-2">Listening for Weak Forms (Nghe dạng yếu)</h3>
+                            <div class="p-4 bg-white rounded-lg shadow-inner">
+                                <p class="mb-4 text-gray-600">Nghe câu và gõ lại chính xác những gì bạn nghe được.</p>
+                                <button class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition mb-4" id="play-weak-form-sentence">Nghe câu</button>
+                                <div class="flex items-center">
+                                    <input type="text" id="weak-form-input" class="w-full p-2 border rounded-md" placeholder="Gõ câu bạn nghe được ở đây...">
+                                    <button class="ml-2 px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600" id="check-weak-form-btn">Kiểm tra</button>
+                                </div>
+                                <p id="weak-form-feedback" class="mt-2 font-semibold"></p>
+                                 <div class="text-center mt-4">
+                                    <button id="next-weak-form-btn" class="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition">Câu khác</button>
+                                </div>
+                            </div>
+                        </div>
+                     </div>
+                </section>
+                
+                <!-- PART 4: WRAP-UP -->
+                <section>
+                    <h2 class="text-2xl font-semibold text-gray-800 border-l-4 border-indigo-500 pl-4 mb-6">Phần 4: Tổng kết (10 phút)</h2>
+                    <div class="bg-indigo-50 border border-indigo-200 rounded-lg p-6">
+                        <h3 class="text-xl font-semibold text-indigo-800 mb-4">Gợi ý tự luyện tập</h3>
+                        <ul class="list-disc list-inside space-y-2 text-gray-700">
+                            <li><strong>Shadowing:</strong> Nghe và lặp lại theo người bản xứ (phim, podcast). Bắt chước cả nhịp điệu và ngữ điệu.</li>
+                            <li><strong>Ghi âm:</strong> Tự ghi âm giọng nói của mình và so sánh với file audio gốc để nhận ra sự khác biệt.</li>
+                            <li><strong>Từ điển:</strong> Luôn tra phiên âm của từ mới. Các từ điển online như Oxford, Cambridge đều có phát âm.</li>
+                            <li><strong>Kiên trì:</strong> Phát âm cần thời gian để cải thiện. Hãy luyện tập đều đặn mỗi ngày!</li>
+                        </ul>
+                    </div>
+                </section>
+            </main>
+
+            <footer class="text-center mt-10 pt-6 border-t border-gray-200">
+                <p class="text-gray-500">Chúc bạn học tốt và tự tin hơn với phát âm tiếng Anh!</p>
+            </footer>
+        </div>
+    </div>
+
+    <script>
+        // JavaScript for Interactivity
+        function speak(text, rate = 0.9) {
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'en-US';
+                utterance.rate = rate;
+                window.speechSynthesis.speak(utterance);
+            } else {
+                alert('Trình duyệt của bạn không hỗ trợ tính năng phát âm. Vui lòng thử trên Chrome hoặc Edge.');
+            }
+        }
+
+        function shuffleArray(array) {
+            let newArr = [...array];
+            for (let i = newArr.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [newArr[i], newArr[j]] = [newArr[j], newArr[i]];
+            }
+            return newArr;
+        }
+
+        // --- Scoreboard Logic ---
+        let students = [];
+        const addStudentBtn = document.getElementById('add-student-btn');
+        const studentNameInput = document.getElementById('student-name-input');
+        const leftScoreboardContent = document.getElementById('left-scoreboard-content');
+        const rightScoreboardContent = document.getElementById('right-scoreboard-content');
+
+        function renderScoreboards() {
+            leftScoreboardContent.innerHTML = '';
+            rightScoreboardContent.innerHTML = '';
+            students.forEach((student, index) => {
+                const entry = document.createElement('div');
+                entry.className = 'student-entry';
+                
+                const nameEl = document.createElement('span');
+                nameEl.className = 'student-name';
+                nameEl.textContent = student.name;
+
+                const scoreEl = document.createElement('span');
+                scoreEl.className = 'student-score';
+                scoreEl.id = `score-${student.id}`;
+                scoreEl.textContent = student.score;
+
+                const plusBtn = document.createElement('button');
+                plusBtn.className = 'score-btn';
+                plusBtn.textContent = '+';
+                plusBtn.onclick = () => incrementScore(student.id);
+
+                entry.appendChild(nameEl);
+                entry.appendChild(scoreEl);
+                entry.appendChild(plusBtn);
+
+                if (index % 2 === 0) {
+                    leftScoreboardContent.appendChild(entry);
+                } else {
+                    rightScoreboardContent.appendChild(entry);
+                }
+            });
+        }
+
+        function incrementScore(studentId) {
+            const student = students.find(s => s.id === studentId);
+            if (student) {
+                student.score++;
+                renderScoreboards();
+            }
+        }
+
+        addStudentBtn.addEventListener('click', () => {
+            const name = studentNameInput.value.trim();
+            if (name && !students.find(s => s.name === name)) {
+                students.push({ id: Date.now(), name: name, score: 0 });
+                studentNameInput.value = '';
+                renderScoreboards();
+            }
+        });
+        studentNameInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                addStudentBtn.click();
+            }
+        });
+
+
+        // --- Sound Quiz Logic ---
+        const soundQuizData = [
+            { word: 'team', prompt: 'nguyên âm', options: ['iː', 'ɪ', 'e', 'æ'], correct: 'iː' }, { word: 'sit', prompt: 'nguyên âm', options: ['iː', 'ɪ', 'e', 'æ'], correct: 'ɪ' }, { word: 'blue', prompt: 'nguyên âm', options: ['uː', 'ʊ', 'ɒ', 'ɔː'], correct: 'uː' }, { word: 'book', prompt: 'nguyên âm', options: ['uː', 'ʊ', 'ɒ', 'ɔː'], correct: 'ʊ' }, { word: 'cat', prompt: 'nguyên âm', options: ['æ', 'ʌ', 'ɑː', 'e'], correct: 'æ' }, { word: 'bed', prompt: 'nguyên âm', options: ['æ', 'ʌ', 'ɑː', 'e'], correct: 'e' }, { word: 'car', prompt: 'nguyên âm', options: ['æ', 'ʌ', 'ɑː', 'ɒ'], correct: 'ɑː' }, { word: 'cup', prompt: 'nguyên âm', options: ['æ', 'ʌ', 'ɑː', 'ɒ'], correct: 'ʌ' }, { word: 'hot', prompt: 'nguyên âm', options: ['ɒ', 'ɔː', 'əʊ', 'aʊ'], correct: 'ɒ' }, { word: 'ball', prompt: 'nguyên âm', options: ['ɒ', 'ɔː', 'əʊ', 'aʊ'], correct: 'ɔː' }, { word: 'bird', prompt: 'nguyên âm', options: ['ɜː', 'ə', 'ɪə', 'eə'], correct: 'ɜː' }, { word: 'say', prompt: 'nguyên âm', options: ['eɪ', 'aɪ', 'ɔɪ', 'əʊ'], correct: 'eɪ' }, { word: 'my', prompt: 'nguyên âm', options: ['eɪ', 'aɪ', 'ɔɪ', 'əʊ'], correct: 'aɪ' }, { word: 'boy', prompt: 'nguyên âm', options: ['eɪ', 'aɪ', 'ɔɪ', 'əʊ'], correct: 'ɔɪ' }, { word: 'go', prompt: 'nguyên âm', options: ['əʊ', 'aʊ', 'uː', 'ɒ'], correct: 'əʊ' }, { word: 'now', prompt: 'nguyên âm', options: ['əʊ', 'aʊ', 'uː', 'ɒ'], correct: 'aʊ' }, { word: 'here', prompt: 'nguyên âm', options: ['ɪə', 'eə', 'ɜː', 'aɪ'], correct: 'ɪə' }, { word: 'hair', prompt: 'nguyên âm', options: ['ɪə', 'eə', 'ɜː', 'aɪ'], correct: 'eə' }, { word: 'pen', prompt: 'phụ âm đầu', options: ['p', 'b', 't', 'd'], correct: 'p' }, { word: 'bed', prompt: 'phụ âm đầu', options: ['p', 'b', 't', 'd'], correct: 'b' }, { word: 'tea', prompt: 'phụ âm đầu', options: ['t', 'd', 'k', 'g'], correct: 't' }, { word: 'dog', prompt: 'phụ âm đầu', options: ['t', 'd', 'k', 'g'], correct: 'd' }, { word: 'key', prompt: 'phụ âm đầu', options: ['k', 'g', 'f', 'v'], correct: 'k' }, { word: 'go', prompt: 'phụ âm đầu', options: ['k', 'g', 'f', 'v'], correct: 'g' }, { word: 'think', prompt: 'phụ âm đầu', options: ['θ', 'ð', 's', 'z'], correct: 'θ' }, { word: 'this', prompt: 'phụ âm đầu', options: ['θ', 'ð', 's', 'z'], correct: 'ð' }, { word: 'see', prompt: 'phụ âm đầu', options: ['s', 'z', 'ʃ', 'ʒ'], correct: 's' }, { word: 'zoo', prompt: 'phụ âm đầu', options: ['s', 'z', 'ʃ', 'ʒ'], correct: 'z' }, { word: 'she', prompt: 'phụ âm đầu', options: ['ʃ', 'ʒ', 'tʃ', 'dʒ'], correct: 'ʃ' }, { word: 'chair', prompt: 'phụ âm đầu', options: ['ʃ', 'ʒ', 'tʃ', 'dʒ'], correct: 'tʃ' }, { word: 'jam', prompt: 'phụ âm đầu', options: ['ʃ', 'ʒ', 'tʃ', 'dʒ'], correct: 'dʒ' }, { word: 'sing', prompt: 'phụ âm cuối', options: ['m', 'n', 'ŋ', 'g'], correct: 'ŋ' }
+        ];
+        let shuffledQuizData, currentQuizIndex;
+        const soundQuizPromptEl = document.getElementById('sound-quiz-prompt'), soundQuizWordEl = document.getElementById('sound-quiz-word'), playSoundQuizBtn = document.getElementById('play-sound-quiz-btn'), soundQuizOptionsContainer = document.getElementById('sound-quiz-options'), soundQuizFeedbackEl = document.getElementById('sound-quiz-feedback'), nextSoundQuizBtn = document.getElementById('next-sound-quiz-btn');
+
+        function setupSoundQuiz() {
+            if (!shuffledQuizData) {
+                shuffledQuizData = shuffleArray([...soundQuizData]);
+                currentQuizIndex = 0;
+            }
+            
+            const currentSoundQuizItem = shuffledQuizData[currentQuizIndex];
+            soundQuizPromptEl.textContent = `Chọn ký tự phiên âm cho ${currentSoundQuizItem.prompt} trong từ:`;
+            soundQuizWordEl.textContent = currentSoundQuizItem.word;
+            soundQuizOptionsContainer.innerHTML = '';
+            soundQuizFeedbackEl.textContent = '';
+            soundQuizFeedbackEl.style.opacity = 0;
+            nextSoundQuizBtn.disabled = true;
+
+            const shuffledOptions = shuffleArray([...currentSoundQuizItem.options]);
+            shuffledOptions.forEach(option => {
+                const button = document.createElement('button');
+                button.innerHTML = `<span class="text-3xl">${option}</span>`;
+                button.className = "ipa-option p-4 bg-white border-2 border-gray-300 rounded-lg hover:bg-amber-400 hover:text-white transition focus:outline-none focus:ring-2 focus:ring-indigo-500";
+                button.onclick = () => checkSoundQuizAnswer(option, button, currentSoundQuizItem);
+                soundQuizOptionsContainer.appendChild(button);
+            });
+            speak(currentSoundQuizItem.word);
+        }
+        playSoundQuizBtn.onclick = () => speak(shuffledQuizData[currentQuizIndex].word);
+        nextSoundQuizBtn.onclick = () => {
+            currentQuizIndex++;
+            if (currentQuizIndex >= shuffledQuizData.length) {
+                soundQuizPromptEl.textContent = "Bạn đã hoàn thành tất cả các câu hỏi!";
+                soundQuizWordEl.textContent = "🎉";
+                soundQuizOptionsContainer.innerHTML = '';
+                soundQuizFeedbackEl.style.opacity = 0;
+                nextSoundQuizBtn.disabled = true;
+                nextSoundQuizBtn.textContent = "Đã hoàn thành";
+                return;
+            }
+            setupSoundQuiz();
+        };
+
+        function checkSoundQuizAnswer(selectedOption, buttonElement, currentItem) {
+            const allButtons = soundQuizOptionsContainer.querySelectorAll('button');
+            allButtons.forEach(btn => btn.disabled = true);
+            soundQuizFeedbackEl.style.opacity = 1;
+            if (selectedOption === currentItem.correct) {
+                soundQuizFeedbackEl.textContent = 'Chính xác! 🎉';
+                soundQuizFeedbackEl.className = 'feedback mt-6 p-3 rounded-lg text-center font-semibold text-white bg-green-500';
+                buttonElement.classList.add('correct');
+            } else {
+                soundQuizFeedbackEl.textContent = `Sai rồi! Đáp án đúng là /${currentItem.correct}/.`;
+                soundQuizFeedbackEl.className = 'feedback mt-6 p-3 rounded-lg text-center font-semibold text-white bg-red-500';
+                buttonElement.classList.add('wrong');
+                allButtons.forEach(btn => { if (btn.textContent === currentItem.correct) { btn.classList.add('correct'); } });
+            }
+            nextSoundQuizBtn.disabled = false;
+        }
+
+        // --- Word Stress Quiz Logic ---
+        const stressData = [
+            { word: 'teacher', syllables: ['tea', 'cher'], stressedIndex: 0 }, { word: 'computer', syllables: ['com', 'pu', 'ter'], stressedIndex: 1 }, { word: 'banana', syllables: ['ba', 'na', 'na'], stressedIndex: 1 }, { word: 'important', syllables: ['im', 'por', 'tant'], stressedIndex: 1 }, { word: 'beautiful', syllables: ['beau', 'ti', 'ful'], stressedIndex: 0 }, { word: 'delicious', syllables: ['de', 'li', 'cious'], stressedIndex: 1 }, { word: 'exercise', syllables: ['ex', 'er', 'cise'], stressedIndex: 0 }, { word: 'understand', syllables: ['un', 'der', 'stand'], stressedIndex: 2 }, { word: 'photograph', syllables: ['pho', 'to', 'graph'], stressedIndex: 0 }, { word: 'photography', syllables: ['pho', 'tog', 'ra', 'phy'], stressedIndex: 1 }, { word: 'Japanese', syllables: ['Ja', 'pa', 'nese'], stressedIndex: 2 }, { word: 'information', syllables: ['in', 'for', 'ma', 'tion'], stressedIndex: 2 }, { word: 'university', syllables: ['u', 'ni', 'ver', 'si', 'ty'], stressedIndex: 2 }, { word: 'communication', syllables: ['com', 'mu', 'ni', 'ca', 'tion'], stressedIndex: 3 }, { word: 'possibility', syllables: ['pos', 'si', 'bil', 'i', 'ty'], stressedIndex: 2 }, { word: 'economic', syllables: ['e', 'co', 'nom', 'ic'], stressedIndex: 2 }, { word: 'application', syllables: ['ap', 'pli', 'ca', 'tion'], stressedIndex: 2 }, { word: 'politics', syllables: ['pol', 'i', 'tics'], stressedIndex: 0 }, { word: 'political', syllables: ['po', 'lit', 'i', 'cal'], stressedIndex: 1 }, { word: 'celebrate', syllables: ['cel', 'e', 'brate'], stressedIndex: 0 }
+        ];
+        let shuffledStressData, currentStressIndex;
+        const stressQuizContainer = document.getElementById('word-stress-quiz'), stressFeedbackDiv = document.getElementById('stress-feedback'), nextStressBtn = document.getElementById('next-stress-word');
+
+        function setupStressQuiz() {
+            if (!shuffledStressData) {
+                shuffledStressData = shuffleArray([...stressData]);
+                currentStressIndex = 0;
+            }
+            
+            const currentStressWord = shuffledStressData[currentStressIndex];
+            stressQuizContainer.innerHTML = '';
+            stressFeedbackDiv.textContent = '';
+            stressFeedbackDiv.style.opacity = 0;
+            nextStressBtn.disabled = true;
+
+            currentStressWord.syllables.forEach((syllable, index) => {
+                const span = document.createElement('span');
+                span.textContent = syllable;
+                span.className = 'syllable px-2 py-1 rounded-md';
+                span.style.pointerEvents = 'auto';
+                span.onclick = () => checkStressAnswer(index, currentStressWord);
+                stressQuizContainer.appendChild(span);
+            });
+            speak(currentStressWord.word);
+        }
+        
+        function checkStressAnswer(selectedIndex, currentItem) {
+            const syllables = stressQuizContainer.querySelectorAll('.syllable');
+            syllables.forEach(s => s.style.pointerEvents = 'none');
+            stressFeedbackDiv.style.opacity = 1;
+            if (selectedIndex === currentItem.stressedIndex) {
+                stressFeedbackDiv.textContent = 'Tuyệt vời! Đó chính là trọng âm. 👍';
+                stressFeedbackDiv.className = 'feedback mt-4 p-3 rounded-lg text-center font-semibold text-white bg-green-500';
+            } else {
+                stressFeedbackDiv.textContent = `Chưa đúng. Nghe lại từ và thử lại nhé!`;
+                stressFeedbackDiv.className = 'feedback mt-4 p-3 rounded-lg text-center font-semibold text-white bg-red-500';
+                speak(currentItem.word);
+                setTimeout(() => {
+                    syllables.forEach(s => s.style.pointerEvents = 'auto');
+                }, 1500);
+            }
+             if (selectedIndex === currentItem.stressedIndex) nextStressBtn.disabled = false;
+        }
+        nextStressBtn.addEventListener('click', () => {
+            currentStressIndex++;
+            if (currentStressIndex >= shuffledStressData.length) {
+                stressQuizContainer.innerHTML = `<p class="text-2xl">🎉 Bạn đã hoàn thành phần này! 🎉</p>`;
+                stressFeedbackDiv.style.opacity = 0;
+                nextStressBtn.disabled = true;
+                nextStressBtn.textContent = "Đã hoàn thành";
+                return;
+            }
+            setupStressQuiz();
+        });
+
+        // --- Linking Sounds Logic (EXPANDED) ---
+        const linkingData = [
+            { plain: "First of all", linked: "Firs<span class='ipa'>t‿of‿</span>all" }, { plain: "Come on in", linked: "Come<span class='ipa'>‿</span>o<span class='ipa'>n‿</span>in" }, { plain: "I need a bit of it", linked: "I nee<span class='ipa'>d‿</span>a bi<span class='ipa'>t‿</span>o<span class='ipa'>f‿</span>it" }, { plain: "She is an old friend", linked: "She<span class='ipa'>‿</span>i<span class='ipa'>s‿</span>a<span class='ipa'>n‿</span>ol<span class='ipa'>d‿</span>friend" }, { plain: "What a good idea", linked: "Wha<span class='ipa'>t‿</span>a goo<span class='ipa'>d‿</span>idea" }, { plain: "Pick it up", linked: "Pic<span class='ipa'>k‿</span>i<span class='ipa'>t‿</span>up" }, { plain: "Turn it off", linked: "Tur<span class='ipa'>n‿</span>i<span class='ipa'>t‿</span>off" }, { plain: "I am happy", linked: "I<span class='ipa'>‿(j)</span>am happy" }, { plain: "He is here", linked: "He<span class='ipa'>‿(j)</span>is here" }, { plain: "Go away", linked: "Go<span class='ipa'>‿(w)</span>away" }, { plain: "Do it now", linked: "Do<span class='ipa'>‿(w)</span>it now" }, { plain: "Read a book", linked: "Rea<span class='ipa'>d‿</span>a book" }, { plain: "It's on the table", linked: "It'<span class='ipa'>s‿</span>on the table" }, { plain: "Is it an apple?", linked: "I<span class='ipa'>s‿</span>i<span class='ipa'>t‿</span>a<span class='ipa'>n‿</span>apple?" }, { plain: "My name is Alex", linked: "My name<span class='ipa'>‿</span>is Alex" }, { plain: "This is an example", linked: "Thi<span class='ipa'>s‿</span>i<span class='ipa'>s‿</span>a<span class='ipa'>n‿</span>example" }, { plain: "She has a lot of energy", linked: "She ha<span class='ipa'>s‿</span>a lo<span class='ipa'>t‿</span>o<span class='ipa'>f‿</span>energy" }, { plain: "Can I have a glass of water?", linked: "Ca<span class='ipa'>n‿</span>I ha<span class='ipa'>v‿</span>a glas<span class='ipa'>s‿</span>of water?" }, { plain: "It's a nice evening", linked: "It'<span class='ipa'>s‿</span>a nic<span class='ipa'>e‿</span>evening" }, { plain: "You are right", linked: "You<span class='ipa'>‿(w)</span>are right" }
+        ];
+        let currentLinkingIndex = 0;
+        const linkingDisplay = document.getElementById('linking-sentence-display'), showLinkingBtn = document.getElementById('show-linking-btn'), nextLinkingBtn = document.getElementById('next-linking-btn'), playLinkingBtn = document.getElementById('play-linking-btn');
+
+        function setupLinking() {
+            linkingDisplay.innerHTML = linkingData[currentLinkingIndex].plain;
+        }
+        playLinkingBtn.onclick = () => { speak(linkingData[currentLinkingIndex].plain); };
+        showLinkingBtn.onclick = () => { linkingDisplay.innerHTML = linkingData[currentLinkingIndex].linked; };
+        nextLinkingBtn.onclick = () => { currentLinkingIndex = (currentLinkingIndex + 1) % linkingData.length; setupLinking(); };
+
+        // --- Intonation Quiz Logic ---
+        const intonationData = [
+            { sentence: "What's your name?", type: 'falling' }, { sentence: "Are you a student?", type: 'rising' }, { sentence: "Where do you live?", type: 'falling' }, { sentence: "Is this your book?", type: 'rising' }, { sentence: "He lives in London.", type: 'falling' }, { sentence: "Can you help me?", type: 'rising' }, { sentence: "How old are you?", type: 'falling' }, { sentence: "Do you like coffee?", type: 'rising' }, { sentence: "I'm going to the store.", type: 'falling' }, { sentence: "Have you finished your homework?", type: 'rising' }, { sentence: "Why are you late?", type: 'falling' }, { sentence: "Would you like some water?", type: 'rising' }, { sentence: "This is my new car.", type: 'falling' }, { sentence: "Did you see that?", type: 'rising' }, { sentence: "When does the movie start?", type: 'falling' }, { sentence: "It's a beautiful day.", type: 'falling' }, { sentence: "Does he play football?", type: 'rising' }, { sentence: "Who is that person?", type: 'falling' }, { sentence: "Can I have some more?", type: 'rising' }, { sentence: "The train arrives at ten.", type: 'falling' }, { sentence: "Are we there yet?", type: 'rising' }, { sentence: "What time is it?", type: 'falling' }, { sentence: "Do you want to go out?", type: 'rising' }, { sentence: "I really like your shoes.", type: 'falling' }, { sentence: "Is she coming to the party?", type: 'rising' }, { sentence: "How was your weekend?", type: 'falling' }, { sentence: "Should I call him?", type: 'rising' }, { sentence: "That's an interesting idea.", type: 'falling' }, { sentence: "Have they left already?", type: 'rising' }, { sentence: "I'll see you tomorrow.", type: 'falling' }
+        ];
+        let shuffledIntonationData, currentIntonationIndex;
+        const intonationSentenceDisplay = document.getElementById('intonation-sentence-display'), intonationFeedbackEl = document.getElementById('intonation-feedback'), nextIntonationBtn = document.getElementById('next-intonation-btn');
+
+        function setupIntonationQuiz() {
+            if (!shuffledIntonationData) {
+                shuffledIntonationData = shuffleArray([...intonationData]);
+                currentIntonationIndex = 0;
+            }
+            
+            const currentIntonationItem = shuffledIntonationData[currentIntonationIndex];
+            intonationSentenceDisplay.textContent = currentIntonationItem.sentence;
+            intonationFeedbackEl.textContent = '';
+            intonationFeedbackEl.style.opacity = 0;
+            const allButtons = intonationFeedbackEl.parentElement.querySelectorAll('button');
+            allButtons.forEach(btn => btn.disabled = false);
+            nextIntonationBtn.disabled = true;
+        }
+
+        function checkIntonation(type) {
+            const currentIntonationItem = shuffledIntonationData[currentIntonationIndex];
+            const allButtons = intonationFeedbackEl.parentElement.querySelectorAll('button');
+            allButtons.forEach(btn => btn.disabled = true);
+            intonationFeedbackEl.style.opacity = 1;
+            if (type === currentIntonationItem.type) {
+                intonationFeedbackEl.textContent = 'Chính xác!';
+                intonationFeedbackEl.className = 'feedback mt-4 p-3 rounded-lg text-center font-semibold text-white bg-green-500';
+            } else {
+                intonationFeedbackEl.textContent = `Chưa đúng. Đây là câu ${currentIntonationItem.type === 'rising' ? 'hỏi Yes/No (lên giọng)' : 'trần thuật/hỏi Wh- (xuống giọng)'}.`;
+                intonationFeedbackEl.className = 'feedback mt-4 p-3 rounded-lg text-center font-semibold text-white bg-red-500';
+            }
+            nextIntonationBtn.disabled = false;
+        }
+        nextIntonationBtn.addEventListener('click', () => {
+            currentIntonationIndex++;
+            if (currentIntonationIndex >= shuffledIntonationData.length) {
+                intonationSentenceDisplay.textContent = "🎉 Bạn đã hoàn thành phần này! 🎉";
+                intonationFeedbackEl.style.opacity = 0;
+                nextIntonationBtn.disabled = true;
+                nextIntonationBtn.textContent = "Đã hoàn thành";
+                const choiceButtons = intonationFeedbackEl.parentElement.querySelectorAll('button:not(#next-intonation-btn)');
+                choiceButtons.forEach(btn => btn.disabled = true);
+                return;
+            }
+            setupIntonationQuiz();
+        });
+
+        // --- Weak Form Listening ---
+        const weakFormData = [
+            { sentence: "I can go to the shop for a bit", text: "I can go to the shop for a bit" }, { sentence: "What do you want", text: "What do you want" }, { sentence: "She was here a minute ago", text: "She was here a minute ago" }, { sentence: "A cup of tea please", text: "A cup of tea please" }, { sentence: "Where are you from", text: "Where are you from" }, { sentence: "I'd like a piece of cake", text: "I'd like a piece of cake" }, { sentence: "He's taller than me", text: "He's taller than me" }, { sentence: "We can meet at the station", text: "We can meet at the station" }, { sentence: "This is for you", text: "This is for you" }, { sentence: "Fish and chips", text: "Fish and chips" }, { sentence: "I must go now", text: "I must go now" }, { sentence: "Tell them to wait", text: "Tell them to wait" }, { sentence: "He has a lot of books", text: "He has a lot of books" }, { sentence: "She should be here soon", text: "She should be here soon" }, { sentence: "It was a good film", text: "It was a good film" }, { sentence: "I'm looking for a new job", text: "I'm looking for a new job" }, { sentence: "What are you doing", text: "What are you doing" }, { sentence: "I went to bed at ten", text: "I went to bed at ten" }, { sentence: "It's a quarter to three", text: "It's a quarter to three" }, { sentence: "Can I have some of that", text: "Can I have some of that" }, { sentence: "The book is on the table", text: "The book is on the table" }, { sentence: "He's a friend of mine", text: "He's a friend of mine" }, { sentence: "I have to go", text: "I have to go" }, { sentence: "She's from Canada", text: "She's from Canada" }, { sentence: "I'll be there in a minute", text: "I'll be there in a minute" }, { sentence: "He can speak English", text: "He can speak English" }, { sentence: "I'm at home", text: "I'm at home" }, { sentence: "Bread and butter", text: "Bread and butter" }, { sentence: "I'll ask her later", text: "I'll ask her later" }, { sentence: "There are four of them", text: "There are four of them" }
+        ];
+        let shuffledWeakFormData, currentWeakFormIndex;
+        const playWeakFormBtn = document.getElementById('play-weak-form-sentence'), weakFormInput = document.getElementById('weak-form-input'), checkWeakFormBtn = document.getElementById('check-weak-form-btn'), weakFormFeedback = document.getElementById('weak-form-feedback'), nextWeakFormBtn = document.getElementById('next-weak-form-btn');
+
+        function setupWeakFormQuiz() {
+            if (!shuffledWeakFormData) {
+                shuffledWeakFormData = shuffleArray([...weakFormData]);
+                currentWeakFormIndex = 0;
+            }
+            
+            weakFormInput.value = '';
+            weakFormInput.placeholder = "Gõ câu bạn nghe được ở đây...";
+            weakFormFeedback.textContent = '';
+            checkWeakFormBtn.disabled = false;
+            nextWeakFormBtn.disabled = true;
+        }
+        playWeakFormBtn.onclick = () => {
+            const currentWeakFormSentence = shuffledWeakFormData[currentWeakFormIndex];
+            speak(currentWeakFormSentence.sentence, 0.85);
+        };
+        checkWeakFormBtn.onclick = () => {
+            const currentWeakFormSentence = shuffledWeakFormData[currentWeakFormIndex];
+            const userInput = weakFormInput.value.trim().replace(/[.,?]/g, '').toLowerCase();
+            const correctAnswer = currentWeakFormSentence.text.replace(/[.,?]/g, '').toLowerCase();
+            if (userInput === correctAnswer) {
+                weakFormFeedback.textContent = 'Tuyệt vời, bạn đã nghe đúng!';
+                weakFormFeedback.style.color = 'var(--correct-color)';
+            } else {
+                weakFormFeedback.textContent = `Chưa chính xác. Câu đúng là: "${currentWeakFormSentence.text}"`;
+                weakFormFeedback.style.color = 'var(--wrong-color)';
+            }
+            checkWeakFormBtn.disabled = true;
+            nextWeakFormBtn.disabled = false;
+        };
+        nextWeakFormBtn.addEventListener('click', () => {
+            currentWeakFormIndex++;
+            if (currentWeakFormIndex >= shuffledWeakFormData.length) {
+                weakFormInput.placeholder = "Bạn đã hoàn thành phần này!";
+                weakFormInput.disabled = true;
+                playWeakFormBtn.disabled = true;
+                checkWeakFormBtn.disabled = true;
+                nextWeakFormBtn.disabled = true;
+                nextWeakFormBtn.textContent = "Đã hoàn thành";
+                return;
+            }
+            setupWeakFormQuiz();
+        });
+        
+        // Initial setup when the page loads
+        window.onload = () => {
+            setupSoundQuiz();
+            setupStressQuiz();
+            setupLinking();
+            setupIntonationQuiz();
+            setupWeakFormQuiz();
+        };
+
+    </script>
+
+</body>
+</html>
