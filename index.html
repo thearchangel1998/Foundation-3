@@ -209,19 +209,6 @@
                  </div>
                 </section>
                 
-                <!-- PART 4: WRAP-UP -->
-                <section>
-                    <h2 class="text-2xl font-semibold text-gray-800 border-l-4 border-indigo-500 pl-4 mb-6">Phần 4: Tổng kết (10 phút)</h2>
-                    <div class="bg-indigo-50 border border-indigo-200 rounded-lg p-6">
-                        <h3 class="text-xl font-semibold text-indigo-800 mb-4">Gợi ý tự luyện tập</h3>
-                        <ul class="list-disc list-inside space-y-2 text-gray-700">
-                            <li><strong>Shadowing:</strong> Nghe và lặp lại theo người bản xứ (phim, podcast). Bắt chước cả nhịp điệu và ngữ điệu.</li>
-                            <li><strong>Ghi âm:</strong> Tự ghi âm giọng nói của mình và so sánh với file audio gốc để nhận ra sự khác biệt.</li>
-                            <li><strong>Từ điển:</strong> Luôn tra phiên âm của từ mới. Các từ điển online như Oxford, Cambridge đều có phát âm.</li>
-                            <li><strong>Kiên trì:</strong> Phát âm cần thời gian để cải thiện. Hãy luyện tập đều đặn mỗi ngày!</li>
-                        </ul>
-                    </div>
-                </section>
             </main>
 
             <footer class="text-center mt-10 pt-6 border-t border-gray-200">
@@ -346,7 +333,7 @@
             currentQuizIndex++;
             if (currentQuizIndex >= shuffledQuizData.length) {
                 soundQuizPromptEl.textContent = "Bạn đã hoàn thành tất cả các câu hỏi!";
-                soundQuizWordEl.textContent = "🎉";
+                soundQuizWordEl.textContent = "�";
                 soundQuizOptionsContainer.innerHTML = '';
                 soundQuizFeedbackEl.style.opacity = 0;
                 nextSoundQuizBtn.disabled = true;
@@ -432,19 +419,38 @@
             setupStressQuiz();
         });
 
-        // --- Linking Sounds Logic (EXPANDED) ---
+        // --- Linking Sounds Logic (EXPANDED & FIXED) ---
         const linkingData = [
             { plain: "First of all", linked: "Firs<span class='ipa'>t‿of‿</span>all" }, { plain: "Come on in", linked: "Come<span class='ipa'>‿</span>o<span class='ipa'>n‿</span>in" }, { plain: "I need a bit of it", linked: "I nee<span class='ipa'>d‿</span>a bi<span class='ipa'>t‿</span>o<span class='ipa'>f‿</span>it" }, { plain: "She is an old friend", linked: "She<span class='ipa'>‿</span>i<span class='ipa'>s‿</span>a<span class='ipa'>n‿</span>ol<span class='ipa'>d‿</span>friend" }, { plain: "What a good idea", linked: "Wha<span class='ipa'>t‿</span>a goo<span class='ipa'>d‿</span>idea" }, { plain: "Pick it up", linked: "Pic<span class='ipa'>k‿</span>i<span class='ipa'>t‿</span>up" }, { plain: "Turn it off", linked: "Tur<span class='ipa'>n‿</span>i<span class='ipa'>t‿</span>off" }, { plain: "I am happy", linked: "I<span class='ipa'>‿(j)</span>am happy" }, { plain: "He is here", linked: "He<span class='ipa'>‿(j)</span>is here" }, { plain: "Go away", linked: "Go<span class='ipa'>‿(w)</span>away" }, { plain: "Do it now", linked: "Do<span class='ipa'>‿(w)</span>it now" }, { plain: "Read a book", linked: "Rea<span class='ipa'>d‿</span>a book" }, { plain: "It's on the table", linked: "It'<span class='ipa'>s‿</span>on the table" }, { plain: "Is it an apple?", linked: "I<span class='ipa'>s‿</span>i<span class='ipa'>t‿</span>a<span class='ipa'>n‿</span>apple?" }, { plain: "My name is Alex", linked: "My name<span class='ipa'>‿</span>is Alex" }, { plain: "This is an example", linked: "Thi<span class='ipa'>s‿</span>i<span class='ipa'>s‿</span>a<span class='ipa'>n‿</span>example" }, { plain: "She has a lot of energy", linked: "She ha<span class='ipa'>s‿</span>a lo<span class='ipa'>t‿</span>o<span class='ipa'>f‿</span>energy" }, { plain: "Can I have a glass of water?", linked: "Ca<span class='ipa'>n‿</span>I ha<span class='ipa'>v‿</span>a glas<span class='ipa'>s‿</span>of water?" }, { plain: "It's a nice evening", linked: "It'<span class='ipa'>s‿</span>a nic<span class='ipa'>e‿</span>evening" }, { plain: "You are right", linked: "You<span class='ipa'>‿(w)</span>are right" }
         ];
-        let currentLinkingIndex = 0;
+        let shuffledLinkingData, currentLinkingIndex;
         const linkingDisplay = document.getElementById('linking-sentence-display'), showLinkingBtn = document.getElementById('show-linking-btn'), nextLinkingBtn = document.getElementById('next-linking-btn'), playLinkingBtn = document.getElementById('play-linking-btn');
 
         function setupLinking() {
-            linkingDisplay.innerHTML = linkingData[currentLinkingIndex].plain;
+             if (!shuffledLinkingData) {
+                shuffledLinkingData = shuffleArray([...linkingData]);
+                currentLinkingIndex = 0;
+            }
+            linkingDisplay.innerHTML = shuffledLinkingData[currentLinkingIndex].plain;
+            showLinkingBtn.disabled = false;
         }
-        playLinkingBtn.onclick = () => { speak(linkingData[currentLinkingIndex].plain); };
-        showLinkingBtn.onclick = () => { linkingDisplay.innerHTML = linkingData[currentLinkingIndex].linked; };
-        nextLinkingBtn.onclick = () => { currentLinkingIndex = (currentLinkingIndex + 1) % linkingData.length; setupLinking(); };
+        playLinkingBtn.onclick = () => { speak(shuffledLinkingData[currentLinkingIndex].plain); };
+        showLinkingBtn.onclick = () => { 
+            linkingDisplay.innerHTML = shuffledLinkingData[currentLinkingIndex].linked; 
+            showLinkingBtn.disabled = true;
+        };
+        nextLinkingBtn.onclick = () => { 
+            currentLinkingIndex++;
+            if (currentLinkingIndex >= shuffledLinkingData.length) {
+                linkingDisplay.innerHTML = "🎉 Bạn đã hoàn thành phần này! 🎉";
+                playLinkingBtn.disabled = true;
+                showLinkingBtn.disabled = true;
+                nextLinkingBtn.disabled = true;
+                nextLinkingBtn.textContent = "Đã hoàn thành";
+                return;
+            }
+            setupLinking(); 
+        };
 
         // --- Intonation Quiz Logic ---
         const intonationData = [
@@ -560,3 +566,4 @@
 
 </body>
 </html>
+�
